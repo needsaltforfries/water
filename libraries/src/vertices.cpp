@@ -1,94 +1,17 @@
 #include "vertices.h"
 #include <iostream>
+#include <cmath>
 
-//500 floats, 100 vertices
+//100 vertices
 const int size = 500;
-
-// float vertices1[] = {
-//     //verts                 //cols              //texture
-//     //first face
-//     0.5f,   0.5f,    0.0f,  1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-//     0.5f,   -0.5f,   0.0f,  0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-//     -0.5f,  -0.5f,   0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-//     -0.5f,  0.5f,    0.0f,  1.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-// };
-
-// float cubeVerts[] = {
-//     //vert              //texture
-//     0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-//     0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-//     0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-//     0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-//     -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-//     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-//     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-//     0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-//     0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-//     0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-//     -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-//     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-//     -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-//     -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-//     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-//     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-//     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-//     -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-//     0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-//     0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-//     0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-//     0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-//     0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-//     0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-//     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-//     0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-//     0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-//     0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-//     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-//     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-//     -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-//     0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-//     0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-//     0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-//     -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-//     -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
-// };
-
-// float pyrVerts[] =
-// { //     COORDINATES      TexCoord  //
-//     //base
-// 	-0.5f, 0.0f,  0.5f,   0.0f, 0.0f,
-// 	-0.5f, 0.0f, -0.5f,   0.0f, 1.0f,
-//     0.5f, 0.0f, -0.5f,   1.0f, 1.0f,
-
-//     0.5f, 0.0f, -0.5f,   1.0f, 1.0f,
-//     0.5f, 0.0f,  0.5f,   1.0f, 0.0f,
-//     0.5f, 0.0f,  0.5f,   0.0f, 0.0f,
-
-//     //f1
-//     -0.5f, 0.0f, 0.5f,  0.2f, 0.5f,
-//     0.0f, 0.8f,  0.0f,  0.5f, 1.0f,
-//     0.5f, 0.0f, 0.5f,   0.8f, 0.5f,
-//     //f2
-//     -0.5f, 0.0f, -0.5f, 0.2f, 0.5f,
-//     0.0f, 0.8f, 0.0f, 0.5f, 1.0f,
-//     0.5f, 0.0f, -0.5f, 0.8f, 0.5f,
-//     //f3
-//     0.5f, 0.0f, 0.5f, 0.2f, 0.5f,
-//     0.0f, 0.8f, 0.0f, 0.5f, 1.0f,
-//     0.5f, 0.0f, -0.5f, 0.8f, 0.5f,
-//     //f4
-//     -0.5f, 0.0f, 0.5f, 0.2f, 0.5f,
-//     0.0f, 0.8f, 0.0f, 0.5f, 1.0f,
-//     -0.5f, 0.0f, -0.5f, 0.8f, 0.5f,
-	 
-// };
+const int step = 5;
+const int numVertices = size/step;
 
 float plane[size];
 
 int columns = 10;
 
 void createPlane(){
-    int step = 5;
     int index = 0;
     int col = 0;
     for(int i = 0; i < size; i+=step){
@@ -99,13 +22,13 @@ void createPlane(){
             index = i + j;
             switch(j){
                 case 0:
-                    plane[index] = (-5 + col)/(float)5;
+                    plane[index] = (-5 + col)/5.0;
                     break;
                 case 1:
                     plane[index] = 0;
                     break;
                 case 2:
-                    plane[index] = (-5 + i/(step*columns))/(float)5;
+                    plane[index] = (-5 + i/(step*columns))/5.0;
                     break;
                 case 3:
                 case 4:
@@ -116,6 +39,10 @@ void createPlane(){
         col++;
         //vertex made, make triangle
     }
+    // for(int i = 0; i < 500; i+=5){
+    //     std::cout << plane[i] << ", " << plane[i+1] << ", " << plane[i+2] << std::endl;
+    // }
+    //std::cout << "all vertices." << std::endl;
 }
 
 float* getVertices(){
@@ -124,7 +51,20 @@ float* getVertices(){
     //return vertices;
 }
 
-int numVerts(){
+int vertSize(){
     return size;
     //return sizeof(pyrVerts)/sizeof(float);
+}
+
+int numVerts(){
+    return numVertices;
+}
+
+void makeWave(float dT){
+    for(int i = 0; i < numVertices; ++i){
+        float x = plane[5*i];
+        float z = plane[5*i+2];
+        plane[5*i + 1] = (sin((dT+x+z))+cos(dT+z)+sin(.5*dT+3*x))/5.0;
+    }
+    //std::cout << plane[1] << std::endl;
 }

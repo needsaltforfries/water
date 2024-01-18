@@ -27,6 +27,8 @@ glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+bool displayWF = false;
+
 void processInput(GLFWwindow* window);
 int main(){
     //do init
@@ -35,20 +37,22 @@ int main(){
 
     if(win == nullptr)
         return -1;
-    
+
     //vertices
+    float* plane = getVertices();
     VBO vbo;
-    vbo.Bind(getVertices(), numVerts());
+    vbo.Bind(plane, vertSize());
 
     Shader vert("shaders/default.vert", 1);
+    //Shader geom("shaders/default.geom", 2);
     Shader frag("shaders/default.frag", 0);
     GLuint sp = Shader::linkShaders();
 
-    Texture t("zzk.jpg");
-    t.Bind();
+    //Texture t("zzk.jpg");
+    //t.Bind();
     
     VAO vao;
-    vao.Bind(numVerts(), 5, 3, sizeof(float));
+    vao.Bind(vertSize(), 5, 3, sizeof(float));
 
     EBO ebo;
     ebo.Bind();
@@ -82,16 +86,19 @@ int main(){
         processInput(win);
 
         //do rendering
-        glClearColor(0.1f, 0.2f, 0.2f, 1.0f);
+        glClearColor(0.9f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         //update color
         float dT = glfwGetTime();
         float val = (sin(dT)/4.0f) + 0.7f;
 
-        const float radius = 5.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
+        
+        makeWave(dT);
+
+        //const float radius = 5.0f;
+        //float camX = sin(glfwGetTime()) * radius;
+        //float camZ = cos(glfwGetTime()) * radius;
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
@@ -105,15 +112,25 @@ int main(){
         unsigned int transformLoc = glGetUniformLocation(sp, "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
+        //vertex position
+        unsigned int waveHeight = glGetUniformLocation(sp, "waveHeight");
+        glUniform4f(waveHeight, 1.0, val, 1.0, 1.0);
+
+        //frag color
         int VCL = glGetUniformLocation(sp, "delta");
-        glUniform4f(VCL, 0.0f, 0.0, val, 1.0f);
+        glUniform4f(VCL, 0.0f, 0.0, 1.0, 1.0f);
         glUseProgram(sp);
         
-        vao.Draw(numVerts());
+        
+        vbo.Bind(plane, vertSize());
+        //vao.Bind(vertSize(), 5, 3, sizeof(float));
+        //ebo.Bind();
+        //vao.Draw(vertSize());
         ebo.Draw();
         //refresh window
         glfwSwapBuffers(win);
         glfwPollEvents();
+
     }
     glfwTerminate();
     return 0;
@@ -132,4 +149,11 @@ void processInput(GLFWwindow* window){
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
+        if(displayWF)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        displayWF = !displayWF;
+    }
 }

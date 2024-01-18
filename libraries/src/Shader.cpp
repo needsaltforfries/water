@@ -35,13 +35,13 @@ std::string Shader::loadShader(std::string shader){
     while(getline(in, line)){
         shaderSrc += line + '\n';
     }
-    std::cout << "loaded shader " << shader << "." << std::endl;
+    //std::cout << "loaded shader " << shader << "." << std::endl;
     return shaderSrc;
 }
 
 GLuint Shader::linkShaders(){
     shaderProgram = glCreateProgram();
-    std::cout << "linking " << shaders.size() << " shaders." << std::endl;
+    //std::cout << "linking " << shaders.size() << " shaders." << std::endl;
     for(unsigned int id : shaders){
         glAttachShader(shaderProgram, id);
     }
