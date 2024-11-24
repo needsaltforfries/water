@@ -1,28 +1,28 @@
 #include "Shader.h"
 
-static GLuint shaderProgram;
-
-Shader::Shader(std::string path, int type){
-    //get the type of shader
-    GLuint sType = types[type];
-    //get the shader code
-    std::string shaderSource = loadShader(path);
-    const GLchar* src = shaderSource.c_str();
-    id = glCreateShader(sType);
-    glShaderSource(id, 1, &src, NULL);
-    glCompileShader(id);
-    //check if successful
+void cerrs(unsigned int shader, std::string type){
     int success;
     char infoLog[512];
-    glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(id, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" <<
-        infoLog << std::endl;
+    
+    if(type != "PROGRAM"){
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if(!success){
+            glGetProgramInfoLog(shader, 512, NULL, infoLog);
+            std::cout << "ERROR::SHADER::COMPILATION_FAILED -" << type << "\n" <<
+            infoLog << std::endl;
+        }
+        else{
+            std::cout << type << " success\n";
+        }
     }
-    //add to list of shaders
-    shaders.push_back(id);
+    else{
+        glGetProgramiv(shader, GL_LINK_STATUS, &success);
+        if(!success){
+            glGetProgramInfoLog(shader, 512, NULL, infoLog);
+            std::cout << "SHADER_LINKING_ERROR -" << type << "\n" << 
+            infoLog << std::endl;
+        }
+    }
 }
 
 //read shader from shader file
@@ -35,32 +35,47 @@ std::string Shader::loadShader(std::string shader){
     while(getline(in, line)){
         shaderSrc += line + '\n';
     }
-    //std::cout << "loaded shader " << shader << "." << std::endl;
+    // std::cout << "loaded shader " << shader << std::endl;
     return shaderSrc;
 }
 
-GLuint Shader::linkShaders(){
-    shaderProgram = glCreateProgram();
-    //std::cout << "linking " << shaders.size() << " shaders." << std::endl;
-    for(unsigned int id : shaders){
-        glAttachShader(shaderProgram, id);
-    }
-    glLinkProgram(shaderProgram);
-    int success;
-    char infoLog[512];
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success){
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::COMPILATION_FAILED\n" <<
-        infoLog << std::endl;
-    }
-    glUseProgram(shaderProgram);
-    for(unsigned int id : shaders){
-         glDeleteShader(id);
-    }
-    return shaderProgram;
+Shader::Shader(std::string vert, std::string frag){
+    //steps:
+        //1. get shader source code
+        //2. create shader
+        //3. compile shader
+
+    //vertex shader
+    std::string vertCode = loadShader(vert);
+    const GLchar* vertSrc = vertCode.c_str();
+    GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertShader, 1, &vertSrc, NULL);
+    glCompileShader(vertShader);
+    cerrs(vertShader, "VERTEX");
+
+    //fragment shader
+    std::string fragCode = loadShader(frag);
+    const GLchar* fragSrc = fragCode.c_str();
+    GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragShader, 1, &fragSrc, NULL);
+    glCompileShader(fragShader);
+    cerrs(fragShader, "FRAGMENT");
+
+    //link the two shaders
+    id = glCreateProgram();
+    glAttachShader(id, vertShader);
+    glAttachShader(id, fragShader);
+    glLinkProgram(id);
+    cerrs(id, "PROGRAM");
+
+    glDeleteShader(vertShader);
+    glDeleteShader(fragShader);
 }
 
-unsigned int Shader::getId(){
-    return id;
+void Shader::Activate(){
+    glUseProgram(id);
+}
+
+void Shader::Delete(){
+    glDeleteShader(id);
 }

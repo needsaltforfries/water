@@ -5,4 +5,6 @@ class VBO{
     public:
         VBO();
         void Bind(float* verts, int numVerts);
+        void Unbind();
+        unsigned int getId();
 };

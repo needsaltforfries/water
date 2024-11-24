@@ -1,9 +1,5 @@
 #include "my_init.h"
 
-//constants
-const int WIDTH = 800;
-const int HEIGHT = 600;
-
 MOGL::MOGL(){ 
 }
 

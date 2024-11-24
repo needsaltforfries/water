@@ -17,6 +17,10 @@ void VAO::Bind(int numVerts, int stride, int offset, size_t size){
     glEnableVertexAttribArray(2);
 }
 
+void VAO::Unbind(){
+    glBindVertexArray(0);
+}
+
 void VAO::Draw(int numVerts){
     glDrawArrays(GL_TRIANGLES, 0, numVerts);
 }

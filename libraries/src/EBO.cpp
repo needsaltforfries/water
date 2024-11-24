@@ -34,6 +34,9 @@ void EBO::Bind(){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
+void EBO::Unbind(){
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
 void EBO::Draw(){
     glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0);
 }
