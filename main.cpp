@@ -27,12 +27,13 @@ int main(){
     glEnable(GL_DEPTH_TEST);
 
     //vertices
-    float* plane = getVertices();
+    std::vector<float> plane = getVertices();
+    std::vector<unsigned int> inds = getIndices();
     VBO vbo;
-    vbo.Bind(plane, vertSize());
+    vbo.Bind(plane.data(), vertSize());
     VAO vao;
-    vao.Bind(vertSize(), 5, 3, sizeof(float));
-    EBO ebo;
+    vao.Bind(vertSize(), 3, 0, sizeof(float));
+    EBO ebo(inds);
     ebo.Bind();
     // vbo.Unbind();
     // vao.Unbind();
@@ -40,30 +41,27 @@ int main(){
 
     //shaders
     Shader defaultShader("shaders/default.vert", "shaders/default.frag");
-
+    defaultShader.Activate();
     //model
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    int modelLoc = glGetUniformLocation(defaultShader.id, "model");
+    unsigned int modelLoc = glGetUniformLocation(defaultShader.id, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    
-    //frag color
-    int objColor = glGetUniformLocation(defaultShader.id, "objCol");
-    glUniform3f(objColor, 0.2f, 0.2f, 1.0f);
-
-    int lightColor = glGetUniformLocation(defaultShader.id, "lightCol");
-    glUniform3f(lightColor, 1.0f, 1.0f, 1.0f);
 
     //camera
     Camera cam = Camera(WIDTH, HEIGHT, glm::vec3(0.0f, 0.5f, 2.0f));
 
     //set up lighting
     // glm::vec3 lightDir = normalize(light.direction);
-
+    float steppy = (float)getStepSize();
+    steppy = 0.05f;
+    unsigned int stepLoc = glGetUniformLocation(defaultShader.id, "step");
+    glUniform1f(stepLoc, steppy);
+    
     //main loop
     while(!glfwWindowShouldClose(win)){
         //do rendering
-        glClearColor(0.4f, 0.5f, 0.2f, 1.0f);
+        glClearColor(0.1f, 0.63f, 0.81f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //calculate deltaTime

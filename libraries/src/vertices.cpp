@@ -1,70 +1,69 @@
 #include "vertices.h"
-#include <iostream>
-#include <cmath>
 
 //100 vertices
-const int size = 500;
-const int step = 5;
-const int numVertices = size/step;
+const double stepSize = 0.05;
+const double LEFT = -2.0;
+const double RIGHT = 2.0;
+const double UP = 2.0;
+const double DOWN = -2.0;
 
-float plane[size];
+int rows = (RIGHT - LEFT) / stepSize;
+int cols = (UP - DOWN) / stepSize;
 
-int columns = 10;
+std::vector<float> verts;
+std::vector<unsigned int> indices;
 
 void createPlane(){
-    int index = 0;
-    int col = 0;
-    for(int i = 0; i < size; i+=step){
-        col = col%columns;
-        //std::cout << std::endl << i << std::endl;
-        //one vertex
-        for(int j = 0; j < step; ++j){
-            index = i + j;
-            switch(j){
-                case 0:
-                    plane[index] = (-5 + col)/5.0;
-                    break;
-                case 1:
-                    plane[index] = 0;
-                    break;
-                case 2:
-                    plane[index] = (-5 + i/(step*columns))/5.0;
-                    break;
-                case 3:
-                case 4:
-                    plane[index] = 1.0f;
-                    break;
-            }           
+    //generate vertices  
+    for(double x = LEFT; x <= RIGHT; x+=stepSize){
+        for(double z = DOWN; z <= UP; z+=stepSize){    
+            verts.push_back(float(x));
+            verts.push_back(float(0.0));
+            verts.push_back(float(z));
         }
-        col++;
-        //vertex made, make triangle
     }
-    // for(int i = 0; i < 500; i+=5){
-    //     std::cout << plane[i] << ", " << plane[i+1] << ", " << plane[i+2] << std::endl;
-    // }
-    //std::cout << "all vertices." << std::endl;
+    //generate indices
+    for(int i = 0; i < rows-1; ++i){
+        for(int j = 0; j < cols-1; ++j){
+            int ul = i * cols + j;
+            int ur = ul + 1;
+            int dl = (i + 1) * cols + j;
+            int dr = dl + 1;
+
+            indices.push_back(ul);
+            indices.push_back(ur);
+            indices.push_back(dr);
+
+            indices.push_back(ul);
+            indices.push_back(dr);
+            indices.push_back(dl);
+        }
+    }
 }
 
-float* getVertices(){
+std::vector<unsigned int> getIndices(){
+    return indices;
+}
+
+std::vector<float> getVertices(){
     createPlane();
-    return plane;
+    return verts;
     //return vertices;
 }
 
-int vertSize(){
-    return size;
-    //return sizeof(pyrVerts)/sizeof(float);
-}
-
 int numVerts(){
-    return numVertices;
+    return verts.size()/3;
 }
 
-void makeWave(float dT){
-    for(int i = 0; i < numVertices; ++i){
-        float x = plane[5*i];
-        float z = plane[5*i+2];
-        plane[5*i + 1] = (sin((dT+x+z))+cos(dT+z)+sin(.5*dT+3*x))/5.0;
-    }
-    //std::cout << plane[1] << std::endl;
+int vertSize(){
+    return verts.size() * sizeof(float);
+}
+double getStepSize(){
+    return stepSize;
+}
+int numRows(){
+    return rows;
+}
+int numCols(){
+    return cols;
 }
