@@ -12,7 +12,7 @@ void main(){
     vec3 amb = vec3(0.1, 0.1, 0.2);
     vec3 objCol = vec3(0.3, 0.3, 0.8);
     vec3 lightCol = vec3(0.63, 0.69, 0.83);
-    vec3 lightPos = vec3(100.0, 100.0, 0.0);
+    vec3 lightPos = vec3(10.0, 10.0, 0.0);
     
     vec3 normal = normalize(norm);
     vec3 lightDir = (camMatrix*vec4(normalize(lightPos - pos),1.0)).xyz;
