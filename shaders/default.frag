@@ -12,10 +12,10 @@ void main(){
     vec3 amb = vec3(0.1, 0.1, 0.2);
     vec3 objCol = vec3(0.3, 0.3, 0.8);
     vec3 lightCol = vec3(0.63, 0.69, 0.83);
-    vec3 lightPos = vec3(10.0, 10.0, 0.0);
+    vec3 lightPos = vec3(100.0, 10.0, 0.0);
     
     vec3 normal = normalize(norm);
-    vec3 lightDir = (camMatrix*vec4(normalize(lightPos - pos),1.0)).xyz;
+    vec3 lightDir = normalize((inverse(camMatrix) * vec4(lightPos - pos, 1.0)).xyz).xyz;
 
     //diff
     float d = max(dot(normal, lightDir), 0.0);
@@ -24,7 +24,7 @@ void main(){
     //spec
     vec3 viewDir = normalize(camPos - pos);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float shininess = 32.0;
+    float shininess = 16.0;
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
     vec3 specular = spec * lightCol; 
 

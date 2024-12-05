@@ -10,10 +10,11 @@ uniform mat4 camMatrix;
 uniform float dT;
 uniform float step;
 
-const float lacunarity = 1.68;
-const float gain = 0.43;
-const float maxWaves = 10.0;
+const float lacunarity = 1.42;
+const float gain = 0.23;
+const float maxWaves = 200.0;
 
+//random function taken from Book of Shaders
 float random(in vec2 _st) {
     return fract(sin(dot(_st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
@@ -23,30 +24,34 @@ void main() {
     float y = 0.0;
     float z = aPos.z;
 
-    float a = 0.5;
-    float w = 1.0;
+    float a = 0.22;
+    float w = 1.02;
     
     float dX = 0.0;
     float dZ = 0.0;
 
     for (float i = 1.0; i <= maxWaves; ++i) {
-        w *= lacunarity;
-        a *= gain;
 
-        float r1 = random(vec2(aPos.x, aPos.z));
-        float r2 = random(vec2(1.0, 1.0));
-        vec2 r = normalize(vec2(r1, r2));
-        
-        //y += a * sin(dot(r, aPos.xz)*w + dT);
+        float r1 = random(vec2(1.89 + aPos.x, 1.2 + aPos.z));
+        float r2 = random(vec2(1.6 + aPos.z, 1.3 + aPos.x));
+        vec2 r = 0.03 * normalize(vec2(r1, r2));
+        y += a * sin(dot(aPos.xz, r) * w + i*dT);
         y += a * sin(aPos.x * w + i*dT);
         y += a * sin(aPos.z * w + i*dT);
+
+        dX += r.x * a * w * cos(r.x*(x+step)) * sin(r.x*(x+step)*w + i*dT);
         dX += a * w * cos((x+step)) * sin((x+step)*w + i*dT);
+        
+        dZ += r.y * a * w * cos(r.y*(z+step)) * sin(r.y*(z+step)*w + i*dT);
         dZ += a * w * cos((z+step)) * sin((z+step)*w + i*dT);
+
+        w *= lacunarity;
+        a *= gain;
     }
-    float offset = -0.0;
-    vec3 newPos = vec3(x+(dX*step), y + offset, z+(dZ*step));
-    vec3 nextX = vec3(x+step, y+(dX*step) + offset, z);
-    vec3 nextZ = vec3(x, y+(dZ*step) + offset, z+step);
+
+    vec3 newPos = vec3(x+(dX), y, z+(dZ));
+    vec3 nextX = vec3(x+step, y+(dX), z);
+    vec3 nextZ = vec3(x, y+(dZ), z+step);
 
     vec3 AB = nextX - newPos;
     vec3 AC = nextZ - newPos;
